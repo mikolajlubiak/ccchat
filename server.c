@@ -15,30 +15,33 @@
 void func(int connfd)
 {
 	char buff[MAX];
+	char nick[] = "server";
 	int n;
 
 	for (;;)
 	{
-		bzero(buff, MAX);
+		bzero(buff, sizeof(buff));
 
 		read(connfd, buff, sizeof(buff));
+		printf("%s\n", buff);
 
-		printf("From client: %s\nTo client: ", buff);
-
-		bzero(buff, MAX);
+		bzero(buff, sizeof(buff));
 		n = 0;
 
 		while ((buff[n++] = getchar()) != '\n')
 			;
 
-		write(connfd, buff, sizeof(buff));
+		char msg[sizeof(buff)+sizeof(nick)+3];
+
+		sprintf(msg, "%s: %s", nick, buff);
+
+		write(connfd, msg, sizeof(msg));
 
 		if (strncmp("exit", buff, 4) == 0)
 		{
 			printf("Server exit...\n");
 			break;
 		}
-
 	}
 }
 

@@ -16,27 +16,30 @@
 void func(int sockfd)
 {
 	char buff[MAX];
+	char nick[] = "client";
 	int n;
 
 	for (;;)
 	{
 		bzero(buff, sizeof(buff));
 
-		printf("Enter the string: ");
-
 		n = 0;
 
 		while ((buff[n++] = getchar()) != '\n')
 			;
 
-		write(sockfd, buff, sizeof(buff));
+		char msg[sizeof(buff)+sizeof(nick)+3];
+
+		sprintf(msg, "%s: %s", nick, buff);
+
+		write(sockfd, msg, sizeof(buff));
 
 		bzero(buff, sizeof(buff));
 
 		read(sockfd, buff, sizeof(buff));
-		printf("From Server: %s\n", buff);
+		printf("%s\n", buff);
 
-		if (strncmp("exit", buff, 4) == 0)
+		if (strncmp("server: exit", buff, 12) == 0)
 		{
 			printf("Client exit...\n");
 			break;

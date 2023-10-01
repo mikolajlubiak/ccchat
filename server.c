@@ -7,12 +7,13 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <pthread.h>
 
 #define MAX 8192
 #define PORT 1235
 #define SA struct sockaddr
 
-void func(int connfd)
+void *write_msg(int connfd)
 {
 	char buff[MAX];
 	char nick[] = "server";
@@ -21,12 +22,6 @@ void func(int connfd)
 
 	for (;;)
 	{
-		read(connfd, msg, sizeof(msg));
-		printf("%s\n", msg);
-
-		bzero(msg, sizeof(msg));
-
-
 		while ((buff[n++] = getchar()) != '\n');
 		sprintf(msg, "%s: %s", nick, buff);
 		write(connfd, msg, sizeof(msg));
@@ -40,6 +35,24 @@ void func(int connfd)
 		bzero(msg, sizeof(msg));
 		bzero(buff, sizeof(buff));
 		n = 0;
+	}
+}
+
+void *read_msg(int connfd)
+{
+	char buff[MAX];
+
+	for (;;)
+	{
+		read(connfd, buff, sizeof(buff));
+		if (buff[0] != '\0')
+		{
+			printf("%s\n", buff);
+
+			bzero(buff, sizeof(buff));
+		}
+
+		sleep(0.1);
 	}
 }
 
@@ -83,16 +96,28 @@ int main()
 
 	len = sizeof(cli);
 
-	connfd = accept(sockfd, (SA*)&cli, &len);
-	if (connfd < 0)
+	for (;;)
 	{
-		printf("Server accept failed...\n");
-		exit(0);
+		connfd = accept(sockfd, (SA*)&cli, &len);
+		if (connfd < 0)
+		{
+			printf("Server accept failed...\n");
+			exit(0);
+		}
+		else
+			printf("Server accept the client...\n");
+
+		pthread_t read_id;
+		pthread_create(&read_id, NULL, read_msg, connfd);
+		pthread_join(read_id, NULL);
+
+		pthread_t write_id;
+		pthread_create(&write_id, NULL, write_msg, connfd);
+		pthread_join(write_id, NULL);
+
+		sleep(0.1);
 	}
-	else
-		printf("Server accept the client...\n");
 
-	func(connfd);
-
+	pthread_exit(NULL);
 	close(sockfd);
 }

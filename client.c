@@ -8,12 +8,37 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <pthread.h>
 
 #define MAX 8192
 #define PORT 1235
 #define SA struct sockaddr
 
-void func(int sockfd)
+void *read_msg(int sockfd)
+{
+	char buff[MAX];
+
+	for (;;)
+	{
+		read(sockfd, buff, sizeof(buff));
+		if (buff[0] != '\0')
+		{
+			printf("%s\n", buff);
+
+			if (strncmp("server: exit", buff, 12) == 0)
+			{
+				printf("Client exit...\n");
+				break;
+			}
+
+			bzero(buff, sizeof(buff));
+		}
+
+		sleep(0.1);
+	}
+}
+
+void *write_msg(int sockfd)
 {
 	char buff[MAX];
 	char nick[] = "client";
@@ -29,18 +54,6 @@ void func(int sockfd)
 		n = 0;
 		bzero(msg, sizeof(msg));
 		bzero(buff, sizeof(buff));
-
-
-		read(sockfd, msg, sizeof(msg));
-		printf("%s\n", msg);
-
-		if (strncmp("server: exit", msg, 12) == 0)
-		{
-			printf("Client exit...\n");
-			break;
-		}
-
-		bzero(msg, sizeof(msg));
 	}
 }
 
@@ -74,7 +87,15 @@ int main()
 	else
 		printf("Connected to the server...\n");
 
-	func(sockfd);
+	pthread_t read_id;
+	pthread_create(&read_id, NULL, read_msg, sockfd);
+	pthread_join(read_id, NULL);
+
+	pthread_t write_id;
+	pthread_create(&write_id, NULL, write_msg, sockfd);
+	pthread_join(write_id, NULL);
+
+	pthread_exit(NULL);
 
 	close(sockfd);
 }

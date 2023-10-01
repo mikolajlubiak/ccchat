@@ -110,11 +110,11 @@ int main()
 			printf("Server accept the client...\n");
 
 		pthread_t read_id;
-		pthread_create(&read_id, NULL, read_msg, &connfd);
+		pthread_create(&read_id, NULL, read_msg, (void *)&connfd);
 		pthread_join(read_id, NULL);
 
 		pthread_t write_id;
-		pthread_create(&write_id, NULL, write_msg, &connfd);
+		pthread_create(&write_id, NULL, write_msg, (void *)&connfd);
 		pthread_join(write_id, NULL);
 
 		sleep(0.1);

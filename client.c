@@ -90,11 +90,11 @@ int main()
 		printf("Connected to the server...\n");
 
 	pthread_t read_id;
-	pthread_create(&read_id, NULL, read_msg, &sockfd);
+	pthread_create(&read_id, NULL, read_msg, (void *)&sockfd);
 	pthread_join(read_id, NULL);
 
 	pthread_t write_id;
-	pthread_create(&write_id, NULL, write_msg, &sockfd);
+	pthread_create(&write_id, NULL, write_msg, (void *)&sockfd);
 	pthread_join(write_id, NULL);
 
 	pthread_exit(NULL);

@@ -16,6 +16,7 @@ void func(int connfd)
 {
 	char buff[MAX];
 	char nick[] = "server";
+	char msg[sizeof(buff)+sizeof(nick)+2];
 	int n;
 
 	for (;;)
@@ -28,14 +29,10 @@ void func(int connfd)
 		bzero(buff, sizeof(buff));
 		n = 0;
 
-		while ((buff[n++] = getchar()) != '\n')
-			;
-
-		char msg[sizeof(buff)+sizeof(nick)+3];
-
+		while ((buff[n++] = getchar()) != '\n');
 		sprintf(msg, "%s: %s", nick, buff);
-
 		write(connfd, msg, sizeof(msg));
+		bzero(msg, sizeof(msg));
 
 		if (strncmp("exit", buff, 4) == 0)
 		{

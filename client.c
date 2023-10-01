@@ -17,23 +17,19 @@ void func(int sockfd)
 {
 	char buff[MAX];
 	char nick[] = "client";
+	char msg[sizeof(buff)+sizeof(nick)+2];
 	int n;
 
 	for (;;)
 	{
 		bzero(buff, sizeof(buff));
-
 		n = 0;
 
-		while ((buff[n++] = getchar()) != '\n')
-			;
-
-		char msg[sizeof(buff)+sizeof(nick)+3];
-
+		while ((buff[n++] = getchar()) != '\n');
 		sprintf(msg, "%s: %s", nick, buff);
-
 		write(sockfd, msg, sizeof(buff));
 
+		bzero(msg, sizeof(msg));
 		bzero(buff, sizeof(buff));
 
 		read(sockfd, buff, sizeof(buff));
@@ -44,7 +40,6 @@ void func(int sockfd)
 			printf("Client exit...\n");
 			break;
 		}
-
 	}
 }
 

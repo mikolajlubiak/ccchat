@@ -22,24 +22,25 @@ void func(int sockfd)
 
 	for (;;)
 	{
-		bzero(buff, sizeof(buff));
-		n = 0;
-
 		while ((buff[n++] = getchar()) != '\n');
 		sprintf(msg, "%s: %s", nick, buff);
-		write(sockfd, msg, sizeof(buff));
+		write(sockfd, msg, sizeof(msg));
 
+		n = 0;
 		bzero(msg, sizeof(msg));
 		bzero(buff, sizeof(buff));
 
-		read(sockfd, buff, sizeof(buff));
-		printf("%s\n", buff);
 
-		if (strncmp("server: exit", buff, 12) == 0)
+		read(sockfd, msg, sizeof(msg));
+		printf("%s\n", msg);
+
+		if (strncmp("server: exit", msg, 12) == 0)
 		{
 			printf("Client exit...\n");
 			break;
 		}
+
+		bzero(msg, sizeof(msg));
 	}
 }
 

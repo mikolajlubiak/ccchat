@@ -21,24 +21,25 @@ void func(int connfd)
 
 	for (;;)
 	{
-		bzero(buff, sizeof(buff));
+		read(connfd, msg, sizeof(msg));
+		printf("%s\n", msg);
 
-		read(connfd, buff, sizeof(buff));
-		printf("%s\n", buff);
+		bzero(msg, sizeof(msg));
 
-		bzero(buff, sizeof(buff));
-		n = 0;
 
 		while ((buff[n++] = getchar()) != '\n');
 		sprintf(msg, "%s: %s", nick, buff);
 		write(connfd, msg, sizeof(msg));
-		bzero(msg, sizeof(msg));
 
 		if (strncmp("exit", buff, 4) == 0)
 		{
 			printf("Server exit...\n");
 			break;
 		}
+
+		bzero(msg, sizeof(msg));
+		bzero(buff, sizeof(buff));
+		n = 0;
 	}
 }
 

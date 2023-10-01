@@ -14,8 +14,9 @@
 #define PORT 1235
 #define SA struct sockaddr
 
-void *read_msg(int sockfd)
+void *read_msg(void *ptr_sockfd)
 {
+	int sockfd = *(int *)ptr_sockfd;
 	char buff[MAX];
 
 	for (;;)
@@ -38,8 +39,9 @@ void *read_msg(int sockfd)
 	}
 }
 
-void *write_msg(int sockfd)
+void *write_msg(void *ptr_sockfd)
 {
+	int sockfd = *(int *)ptr_sockfd;
 	char buff[MAX];
 	char nick[] = "client";
 	char msg[sizeof(buff)+sizeof(nick)+2];
@@ -88,11 +90,11 @@ int main()
 		printf("Connected to the server...\n");
 
 	pthread_t read_id;
-	pthread_create(&read_id, NULL, read_msg, sockfd);
+	pthread_create(&read_id, NULL, read_msg, &sockfd);
 	pthread_join(read_id, NULL);
 
 	pthread_t write_id;
-	pthread_create(&write_id, NULL, write_msg, sockfd);
+	pthread_create(&write_id, NULL, write_msg, &sockfd);
 	pthread_join(write_id, NULL);
 
 	pthread_exit(NULL);

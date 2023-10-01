@@ -13,8 +13,9 @@
 #define PORT 1235
 #define SA struct sockaddr
 
-void *write_msg(int connfd)
+void *write_msg(void *ptr_connfd)
 {
+	int connfd = *(int *)ptr_connfd;
 	char buff[MAX];
 	char nick[] = "server";
 	char msg[sizeof(buff)+sizeof(nick)+2];
@@ -38,8 +39,9 @@ void *write_msg(int connfd)
 	}
 }
 
-void *read_msg(int connfd)
+void *read_msg(void *ptr_connfd)
 {
+	int connfd = *(int *)ptr_connfd;
 	char buff[MAX];
 
 	for (;;)
@@ -58,7 +60,7 @@ void *read_msg(int connfd)
 
 int main()
 {
-	int sockfd, connfd, len;
+	int sockfd, len;
 
 	struct sockaddr_in servaddr, cli;
 
@@ -98,7 +100,7 @@ int main()
 
 	for (;;)
 	{
-		connfd = accept(sockfd, (SA*)&cli, &len);
+		int connfd = accept(sockfd, (SA*)&cli, &len);
 		if (connfd < 0)
 		{
 			printf("Server accept failed...\n");
@@ -108,11 +110,11 @@ int main()
 			printf("Server accept the client...\n");
 
 		pthread_t read_id;
-		pthread_create(&read_id, NULL, read_msg, connfd);
+		pthread_create(&read_id, NULL, read_msg, &connfd);
 		pthread_join(read_id, NULL);
 
 		pthread_t write_id;
-		pthread_create(&write_id, NULL, write_msg, connfd);
+		pthread_create(&write_id, NULL, write_msg, &connfd);
 		pthread_join(write_id, NULL);
 
 		sleep(0.1);

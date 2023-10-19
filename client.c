@@ -34,8 +34,6 @@ void *read_msg(void *ptr_sockfd)
 
 			bzero(buff, sizeof(buff));
 		}
-
-		sleep(0.1);
 	}
 }
 
@@ -96,8 +94,6 @@ int main()
 	pthread_t write_id;
 	pthread_create(&write_id, NULL, write_msg, (void *)&sockfd);
 	pthread_join(write_id, NULL);
-
-	pthread_exit(NULL);
 
 	close(sockfd);
 }

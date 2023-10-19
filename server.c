@@ -116,10 +116,7 @@ int main()
 		pthread_t write_id;
 		pthread_create(&write_id, NULL, write_msg, (void *)&connfd);
 		pthread_join(write_id, NULL);
-
-		sleep(0.1);
 	}
 
-	pthread_exit(NULL);
 	close(sockfd);
 }
